@@ -15,6 +15,7 @@ public class MainActivity extends AppCompatActivity {
 
     private PermissionSupport permission;
     Button button;
+    Button tempButton;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -23,6 +24,7 @@ public class MainActivity extends AppCompatActivity {
 
         permissionCheck();
 
+        //컨텐츠 넘어가는 버튼
         button = findViewById(R.id.button);
         button.setOnClickListener(new View.OnClickListener() {
             @Override
@@ -32,12 +34,22 @@ public class MainActivity extends AppCompatActivity {
                 startActivity(intent);
             }
         });
+
+        //예외용 버튼
+        tempButton = findViewById(R.id.tempButton);
+        tempButton.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                Intent intent = new Intent(getApplicationContext(), ShowContentsActivity.class);
+                intent.putExtra("contentsName","임시 텍스트");
+                startActivity(intent);
+            }
+        });
     }
 
     private void permissionCheck(){
         if(Build.VERSION.SDK_INT>=23){
             permission = new PermissionSupport(this, this);
-
             if(!permission.checkPermission()){
                 permission.requestPermisssion();
             }
