@@ -29,6 +29,14 @@
         </androidx.core.widget.NestedScrollView>
     </LinearLayout>
 
+    <Button
+        android:id="@+id/goToQuizButton"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_gravity="center_horizontal"
+        android:visibility="gone"
+        android:text="퀴즈 풀러가기" />
+
     <LinearLayout
         android:layout_width="match_parent"
         android:layout_height="wrap_content"

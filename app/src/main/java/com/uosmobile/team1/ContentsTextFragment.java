@@ -1,5 +1,6 @@
 package com.uosmobile.team1;
 
+import android.media.MediaPlayer;
 import android.os.Bundle;
 import android.os.Environment;
 import android.view.LayoutInflater;
@@ -20,10 +21,11 @@ public class ContentsTextFragment extends Fragment {
 
     TextView ConTentsTextTextView;
     Button ContentsTextPrevButton,ContentsTextNextButton;
-    int page;//이후 db나 메모리에 저장된 마지막 페이지를 불러온다.
-    int contentsLastPage=18;
-    int readLastPage;
+    int page;//이후 sqlite를 통해 컨텐츠 별 마지막 페이지 저장 후 이를 불러온다.
+    int contentsLastPage=18; //이 또한 db를 통해 마지막을 읽어옴
     String sysDir; //번들로 컨텐츠 이름 받아온다
+    MediaPlayer mediaPlayer;
+    Button goToQuizButton;
     
     @Override
     public void onCreate(Bundle savedInstanceState) {
@@ -36,24 +38,33 @@ public class ContentsTextFragment extends Fragment {
         ConTentsTextTextView = v.findViewById(R.id.ContentsTextTextView);
         ContentsTextPrevButton = v.findViewById(R.id.ContentsTextPrevButton);
         ContentsTextNextButton = v.findViewById(R.id.ContentsTextNextButton);
-        page =1;
+        goToQuizButton = v.findViewById(R.id.goToQuizButton);
+        page = 1; //db를 통해 마지막 페이지 읽어와야 하는 부분
+        //contentsLastPage =  //db를 통해 콘텐츠의 끝 페이지를 읽어와야 하는 부분
 
         //상단 액티비티에서 콘텐츠 이름 받아옴
         Bundle bundle = getArguments();
         String contentsName = bundle.getString("contentsName");
-        sysDir = Environment.getExternalStoragePublicDirectory(Environment.DIRECTORY_DOWNLOADS).getAbsolutePath() + "/" +contentsName;
+        sysDir = Environment.getExternalStoragePublicDirectory(Environment.DIRECTORY_DOWNLOADS).getAbsolutePath() + "/Contents/" +contentsName;
         readContentsPage();
+        playSoundTrack();
 
         //이전 버튼
         ContentsTextPrevButton.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
                 --page;
+                mediaPlayer.stop();
                 if(page==0){
                     Toast.makeText(getContext(), "첫 페이지입니다.",Toast.LENGTH_SHORT).show();
                     page = 1;
+                } else if(page ==contentsLastPage-1){
+                    goToQuizButton.setVisibility(View.GONE);
+                    readContentsPage();
+                    playSoundTrack();
                 }else{
                     readContentsPage();
+                    playSoundTrack();
                 }
             }
         });
@@ -63,11 +74,18 @@ public class ContentsTextFragment extends Fragment {
             @Override
             public void onClick(View v) {
                 ++page;
+                mediaPlayer.stop();
                 if(page>contentsLastPage){
                     Toast.makeText(getContext(), "마지막 페이지입니다.",Toast.LENGTH_SHORT).show();
-                    page = 18;
+                    page = contentsLastPage;
+
+                }else if(page == contentsLastPage){
+                    goToQuizButton.setVisibility(View.VISIBLE);
+                    readContentsPage();
+                    playSoundTrack();
                 }else{
                     readContentsPage();
+                    playSoundTrack();
                 }
             }
         });
@@ -85,6 +103,16 @@ public class ContentsTextFragment extends Fragment {
         } catch (IOException e) {
             e.printStackTrace();
             Toast.makeText(getContext(), "READ 오류",Toast.LENGTH_SHORT).show();
+        }
+    }
+
+    private void playSoundTrack(){
+        try{
+            mediaPlayer = new MediaPlayer();
+            mediaPlayer.setDataSource(sysDir + "/" + page + ".mp3");
+            mediaPlayer.prepare();
+            mediaPlayer.start();
+        } catch(IOException e){
         }
     }
 
