@@ -79,7 +79,6 @@ public class DBHelper extends SQLiteOpenHelper {
                 +" where contents_name = " + contentsName, null);
 
         int page = cursor.getInt(0);
-
         return page;
     }
 }

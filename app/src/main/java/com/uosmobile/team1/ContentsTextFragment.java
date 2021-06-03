@@ -14,8 +14,11 @@ import androidx.fragment.app.Fragment;
 
 import com.uosmobile.team1.DB.DBHelper;
 
+import java.io.File;
+import java.io.FileFilter;
 import java.io.FileInputStream;
 import java.io.IOException;
+import java.util.Locale;
 
 import static com.uosmobile.team1.ShowContentsActivity.contentsDrawingFragment;
 
@@ -33,6 +36,7 @@ public class ContentsTextFragment extends Fragment {
     @Override
     public void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
+        page = 1;
     }
 
     @Override
@@ -50,8 +54,9 @@ public class ContentsTextFragment extends Fragment {
         
         //콘텐츠 이름 바탕 필요 변수 설정
         sysDir = Environment.getExternalStoragePublicDirectory(Environment.DIRECTORY_DOWNLOADS).getAbsolutePath() + "/Contents/" +contentsName;
-        page = 1; //db를 통해 마지막 페이지 읽어와야 하는 부분
-        contentsTotalPage =  18;//db를 통해 콘텐츠의 끝 페이지를 읽어와야 하는 부분
+        //page = 1; //db를 통해 마지막 페이지 읽어와야 하는 부분
+        //contentsTotalPage =  18;//db를 통해 콘텐츠의 끝 페이지를 읽어와야 하는 부분
+        contentsTotalPage=checkTotalPage(sysDir);
         
         //초기화
         readContentsPage();
@@ -133,12 +138,15 @@ public class ContentsTextFragment extends Fragment {
         contentsDrawingFragment.setArguments(bundle);
     }
 
-    //데이터베이스 메서드
-    public void setLastPage(String contentsName, int contentsLastPage){
-
-    }
-
-    public void getLastPage(){
-
+    private int checkTotalPage(String path){
+        File f = new File(path);
+        File[] files = f.listFiles(new FileFilter() {
+            @Override
+            public boolean accept(File pathname) {
+                return pathname.getName().toLowerCase(Locale.US).endsWith(".txt");
+            }
+        });
+        System.out.println("files = " + files.length);
+        return files.length;
     }
 }
